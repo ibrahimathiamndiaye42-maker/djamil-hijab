@@ -1,0 +1,4 @@
+{ "name": "DJAMIL HIJAB — Gestion", "short_name": "Djamil Hijab", "lang": "fr", "start_url": "/", "scope": "/",
+  "display": "standalone", "orientation": "portrait", "background_color": "#fbf6f9", "theme_color": "#6b2d5c",
+  "icons": [ { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+             { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" } ] }
