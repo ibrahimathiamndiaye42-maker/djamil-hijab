@@ -21,9 +21,9 @@ import Reports from "./pages/Reports.jsx";
 import Settings from "./pages/Settings.jsx";
 
 const SIMPLE = true; // mode simple : menu réduit. Mettre false pour réactiver Stock, Arrivages, Inventaires, Rapports, etc.
-const SIMPLE_PATHS = new Set(["/", "dashboard", "/ventes", "/factures", "/employes", "/historique", "/parametres"]);
+const SIMPLE_PATHS = new Set(["/", "/produits", "/ventes", "/factures", "/employes", "/historique", "/parametres"]);
 const NAV = [
-  ["/", "dashboard", "Dashboard", ["reports.read"], Dashboard], ["/produits", "products", "Produits", ["products.read"], Products],
+  ["/", "dashboard", "Accueil", ["reports.read"], Dashboard], ["/produits", "products", "Produits", ["products.read"], Products],
   ["/stock", "stock", "Stock", ["stock.read"], Stock], ["/arrivages", "arrivals", "Arrivages", ["stock.entry"], Arrivals],
   ["/ventes", "sell", "Vendre", ["sales.create"], Sales], ["/factures", "invoice", "Factures", ["sales.read", "sales.read_all"], Invoices],
   ["/clients", "user", "Clients", ["customers.read"], Customers], ["/fournisseurs", "suppliers", "Fournisseurs", ["suppliers.read"], Suppliers],
