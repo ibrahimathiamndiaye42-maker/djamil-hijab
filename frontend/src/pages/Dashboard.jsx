@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../auth";
+import { Icon } from "../icons";
 import { Alert, dt, fmt } from "../ui";
 
 const Card = ({ label, value, tone }) => <div className={"stat " + (tone || "")}><small>{label}</small><b>{value}</b></div>;
@@ -34,7 +35,7 @@ export default function Dashboard() {
       <div className="grid2">
         <div className="card"><h3>Produits les plus vendus</h3>{d.top_products.map((p) => <p key={p.name} className="row"><span>{p.name}</span><b>{p.qty}</b></p>)}</div>
         <div className="card"><h3>Catégories les plus vendues</h3>{d.top_categories.map((p) => <p key={p.name} className="row"><span>{p.name}</span><b>{p.qty}</b></p>)}</div>
-        <div className="card"><h3>⚠️ Écarts récents</h3>
+        <div className="card"><h3><Icon name="alert" size={18} /> Écarts récents</h3>
           {d.recent_gaps.length ? d.recent_gaps.map((g, i) => <p key={i}><b>{g.product}</b><br /><small>Théorique {g.theoretical} · Réel {g.counted} · Écart {g.diff} — {g.user}, {dt(g.date)}</small></p>) : <p className="muted">Aucun écart</p>}</div>
         <div className="card"><h3>Activité récente</h3>{d.recent_activity.map((a, i) => <p key={i}><b>{a.user}</b> — {a.action} {a.ref}<br /><small>{dt(a.date)}</small></p>)}</div>
       </div>

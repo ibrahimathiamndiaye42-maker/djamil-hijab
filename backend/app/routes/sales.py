@@ -17,6 +17,7 @@ def sale_dict(s, full=False):
     out = {"id": s.id, "code": s.code, "invoice_id": s.invoice.id if s.invoice else None,
            "invoice": s.invoice.number if s.invoice else None, "invoice_status": s.invoice.status if s.invoice else None,
            "customer": s.customer.name if s.customer else None, "customer_id": s.customer_id,
+           "customer_phone": s.customer.phone if s.customer else None,
            "user": s.user.full_name, "user_id": s.user_id, "subtotal": s.subtotal, "discount": s.discount,
            "total": s.total, "paid": s.paid, "rest": s.total - s.paid, "status": s.status,
            "payment_status": s.payment_status, "created_at": iso(s.created_at)}

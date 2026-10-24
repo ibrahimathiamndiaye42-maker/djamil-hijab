@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { api } from "./api";
+import { Icon } from "./icons";
 
 export const fmt = (n) => new Intl.NumberFormat("fr-FR").format(n ?? 0);
 export const dt = (s) => (s ? new Date(s).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" }) : "");
@@ -60,7 +61,7 @@ export function Modal({ title, onClose, children, wide }) {
   return (
     <div className="overlay" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className={"modal" + (wide ? " wide" : "")}>
-        <div className="modal-h"><h3>{title}</h3><button className="btn ghost" onClick={onClose}>✕</button></div>
+        <div className="modal-h"><h3>{title}</h3><button className="btn ghost" onClick={onClose} aria-label="Fermer"><Icon name="close" size={18} /></button></div>
         {children}
       </div>
     </div>
@@ -70,8 +71,8 @@ export function Modal({ title, onClose, children, wide }) {
 export const Field = ({ label, children }) => <label className="field"><span>{label}</span>{children}</label>;
 export const Alert = ({ children }) => (children ? <div className="alert">{children}</div> : null);
 
-const STATUS = { NORMAL: ["🟢", "Normal", "ok"], FAIBLE: ["🟠", "Faible", "warn"], RUPTURE: ["🔴", "Rupture", "bad"] };
-export const StockBadge = ({ s }) => <span className={"badge " + STATUS[s][2]}>{STATUS[s][0]} {STATUS[s][1]}</span>;
+const STATUS = { NORMAL: ["Normal", "ok"], FAIBLE: ["Faible", "warn"], RUPTURE: ["Rupture", "bad"] };
+export const StockBadge = ({ s }) => <span className={"badge " + STATUS[s][1]}><i className="dot" />{STATUS[s][0]}</span>;
 
 /** Recherche de produit avec liste déroulante (utilisée dans ventes, arrivages, inventaires). */
 export function ProductPicker({ onPick, placeholder = "Rechercher un produit (nom, référence, PRD-…)" }) {

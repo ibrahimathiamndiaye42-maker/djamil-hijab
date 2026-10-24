@@ -1,6 +1,22 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { Alert, Field, Modal } from "../ui";
+import { Icon } from "../icons";
+
+const SIMPLE_PERMS = [
+  ["products.write", "Ajouter et modifier les produits"],
+  ["stock.entry", "Ajouter du stock"],
+  ["stock.adjust", "Retirer du stock (perte, casse)"],
+  ["sales.read_all", "Voir les ventes et factures de tout le monde"],
+  ["sales.cancel", "Annuler une facture"],
+];
+
+const shareLink = () => {
+  const url = window.location.origin;
+  const text = `Bonjour, voici le lien de l'application de la boutique : ${url}\nOuvrez-le dans Chrome puis touchez « Installer l'application ».`;
+  if (navigator.share) navigator.share({ text, url }).catch(() => {});
+  else window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank");
+};
 
 export default function Employees() {
   const [users, setUsers] = useState([]); const [perms, setPerms] = useState([]); const [f, setF] = useState(null); const [err, setErr] = useState("");
@@ -19,7 +35,7 @@ export default function Employees() {
   const toggle = (code) => setF({ ...f, extra_permissions: f.extra_permissions.includes(code) ? f.extra_permissions.filter((c) => c !== code) : [...f.extra_permissions, code] });
   return (
     <>
-      <div className="toolbar"><h2>Employés</h2><button className="btn" onClick={() => { setErr(""); setF({ username: "", full_name: "", password: "", role: "EMPLOYE", extra_permissions: [], is_active: true }); }}>+ Nouvel employé</button></div>
+      <div className="toolbar"><h2>Employés</h2><span className="btns"><button className="btn ghost" onClick={shareLink}><Icon name="share" size={18} /> Inviter par WhatsApp</button> <button className="btn" onClick={() => { setErr(""); setF({ username: "", full_name: "", password: "", role: "EMPLOYE", extra_permissions: [], is_active: true }); }}>+ Nouvel employé</button></span></div>
       <Alert>{err && !f ? err : ""}</Alert>
       {users.map((u) => <div className="card click" key={u.id} onClick={() => { setErr(""); setF({ ...u, password: "" }); }}><p className="row"><b>{u.full_name}</b><span className={"badge " + (u.is_active ? "ok" : "bad")}>{u.is_active ? u.role : "Désactivé"}</span></p><small>@{u.username}</small></div>)}
       {f && (
@@ -29,8 +45,8 @@ export default function Employees() {
             <Field label="Nom complet *"><input value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} required /></Field>
             <Field label={f.id ? "Nouveau mot de passe (laisser vide pour conserver)" : "Mot de passe * (8 caractères min.)"}><input type="password" value={f.password} onChange={(e) => setF({ ...f, password: e.target.value })} required={!f.id} minLength={f.password ? 8 : undefined} /></Field>
             <Field label="Rôle"><select value={f.role} onChange={(e) => setF({ ...f, role: e.target.value })}><option value="EMPLOYE">Employé</option><option value="ADMIN">Administrateur (tous les droits)</option></select></Field>
-            {f.role === "EMPLOYE" && <><p className="muted">Droits de base d'un employé : consulter produits/stock/clients, créer des ventes. Droits supplémentaires :</p>
-              {perms.map((p) => <label className="chk" key={p.code}><input type="checkbox" checked={f.extra_permissions.includes(p.code)} onChange={() => toggle(p.code)} /> {p.label}</label>)}</>}
+            {f.role === "EMPLOYE" && <><p className="muted">Un employé peut toujours voir les produits et enregistrer des ventes. Cochez ce qu'il peut faire en plus :</p>
+              {SIMPLE_PERMS.map(([code, label]) => <label className="chk" key={code}><input type="checkbox" checked={f.extra_permissions.includes(code)} onChange={() => toggle(code)} /> {label}</label>)}</>}
             {f.id && <label className="chk"><input type="checkbox" checked={f.is_active} onChange={(e) => setF({ ...f, is_active: e.target.checked })} /> Compte actif</label>}
             <div className="actions"><button className="btn">Enregistrer</button></div></form>
         </Modal>)}

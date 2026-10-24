@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../auth";
+import { Icon } from "../icons";
 import { Alert, Modal, Pager, ProductPicker, Table, dt, useList } from "../ui";
 
 export default function Inventories() {
@@ -28,10 +29,10 @@ export default function Inventories() {
             {f.items.map((i) => {
               const diff = i.counted === "" ? null : Number(i.counted) - i.p.stock_qty;
               return (
-                <div className="card" key={i.p.id}><p className="row"><b>{i.p.name}</b><button className="btn ghost" onClick={() => setF({ ...f, items: f.items.filter((x) => x.p.id !== i.p.id) })}>✕</button></p>
+                <div className="card" key={i.p.id}><p className="row"><b>{i.p.name}</b><button className="btn ghost" onClick={() => setF({ ...f, items: f.items.filter((x) => x.p.id !== i.p.id) })}><Icon name="close" size={16} /></button></p>
                   <p>Stock théorique : <b>{i.p.stock_qty}</b></p>
                   <input type="number" min="0" placeholder="Quantité comptée" value={i.counted} onChange={(e) => upd(i.p.id, "counted", e.target.value)} />
-                  {diff ? <><p className="neg">⚠️ Écart : {diff > 0 ? "+" : ""}{diff}</p><input placeholder="Motif obligatoire" value={i.reason} onChange={(e) => upd(i.p.id, "reason", e.target.value)} /></> : null}</div>);
+                  {diff ? <><p className="neg">Écart : {diff > 0 ? "+" : ""}{diff}</p><input placeholder="Motif obligatoire" value={i.reason} onChange={(e) => upd(i.p.id, "reason", e.target.value)} /></> : null}</div>);
             })}
             <div className="actions"><button className="btn" disabled={!ready} onClick={save}>Valider l'inventaire</button></div></div>
         </Modal>)}

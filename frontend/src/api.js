@@ -25,3 +25,19 @@ export async function openPdf(invoiceId) {
   const b = await request(`/invoices/${invoiceId}/pdf`, { blob: true });
   window.open(URL.createObjectURL(b), "_blank");
 }
+
+/** Envoie la facture PDF au client par WhatsApp (partage natif sur téléphone, sinon téléchargement + message WhatsApp). */
+export async function shareInvoiceWhatsApp(sale, shopName, currency) {
+  const blob = await request(`/invoices/${sale.invoice_id}/pdf`, { blob: true });
+  const file = new File([blob], `${sale.invoice}.pdf`, { type: "application/pdf" });
+  const total = new Intl.NumberFormat("fr-FR").format(sale.total);
+  const text = `Bonjour${sale.customer ? " " + sale.customer : ""}, voici votre facture ${sale.invoice} de ${shopName} : ${total} ${currency}. Merci pour votre confiance !`;
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text }); return; } catch (e) { if (e.name === "AbortError") return; }
+  }
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = `${sale.invoice}.pdf`; a.click();
+  let digits = (sale.customer_phone || "").replace(/\D/g, "");
+  if (digits.length === 9) digits = "221" + digits;
+  window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank");
+}

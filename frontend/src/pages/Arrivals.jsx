@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../api";
 import { useAuth } from "../auth";
+import { Icon } from "../icons";
 import { Alert, Field, Modal, Pager, ProductPicker, Table, fmt, today, useList } from "../ui";
 
 export default function Arrivals() {
@@ -34,7 +35,7 @@ export default function Arrivals() {
               <div className="line" key={i.product_id}><span>{i.name}</span>
                 <input type="number" min="1" value={i.qty} onChange={(e) => upd(k, "qty", e.target.value)} aria-label="Quantité" />
                 <input type="number" min="0" value={i.unit_cost} onChange={(e) => upd(k, "unit_cost", e.target.value)} aria-label="Prix d'achat" />
-                <button className="btn ghost" onClick={() => setF({ ...f, items: f.items.filter((_, j) => j !== k) })}>✕</button></div>))}
+                <button className="btn ghost" onClick={() => setF({ ...f, items: f.items.filter((_, j) => j !== k) })}><Icon name="close" size={16} /></button></div>))}
             <Field label="Notes"><input value={f.notes} onChange={(e) => setF({ ...f, notes: e.target.value })} /></Field>
             <p><b>Total : {fmt(total)}</b></p>
             <div className="actions"><button className="btn" disabled={!f.items.length} onClick={save}>Enregistrer l'arrivage</button></div></div>

@@ -3,6 +3,8 @@ import { NavLink, Navigate, Route, Routes } from "react-router-dom";
 import { api } from "./api";
 import { useAuth } from "./auth";
 import { Alert, Field, Modal } from "./ui";
+import { Icon } from "./icons";
+import InstallButton from "./Install.jsx";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Products from "./pages/Products.jsx";
@@ -18,14 +20,16 @@ import Journal from "./pages/Journal.jsx";
 import Reports from "./pages/Reports.jsx";
 import Settings from "./pages/Settings.jsx";
 
+const SIMPLE = true; // mode simple : menu réduit. Mettre false pour réactiver Stock, Arrivages, Inventaires, Rapports, etc.
+const SIMPLE_PATHS = new Set(["/", "dashboard", "/ventes", "/factures", "/employes", "/historique", "/parametres"]);
 const NAV = [
-  ["/", "🏠", "Dashboard", ["reports.read"], Dashboard], ["/produits", "📦", "Produits", ["products.read"], Products],
-  ["/stock", "📊", "Stock", ["stock.read"], Stock], ["/arrivages", "🚚", "Arrivages", ["stock.entry"], Arrivals],
-  ["/ventes", "🛒", "Ventes", ["sales.create"], Sales], ["/factures", "🧾", "Factures", ["sales.read", "sales.read_all"], Invoices],
-  ["/clients", "👥", "Clients", ["customers.read"], Customers], ["/fournisseurs", "🏭", "Fournisseurs", ["suppliers.read"], Suppliers],
-  ["/employes", "👩🏾‍💼", "Employés", ["users.manage"], Employees], ["/inventaires", "📋", "Inventaires", ["inventories.run", "control.read"], Inventories],
-  ["/controle", "🔎", "Contrôle", ["control.read"], Control], ["/historique", "📜", "Historique", ["audit.read"], Journal],
-  ["/rapports", "📈", "Rapports", ["reports.read"], Reports], ["/parametres", "⚙️", "Paramètres", ["settings.write"], Settings],
+  ["/", "dashboard", "Dashboard", ["reports.read"], Dashboard], ["/produits", "products", "Produits", ["products.read"], Products],
+  ["/stock", "stock", "Stock", ["stock.read"], Stock], ["/arrivages", "arrivals", "Arrivages", ["stock.entry"], Arrivals],
+  ["/ventes", "sell", "Vendre", ["sales.create"], Sales], ["/factures", "invoice", "Factures", ["sales.read", "sales.read_all"], Invoices],
+  ["/clients", "user", "Clients", ["customers.read"], Customers], ["/fournisseurs", "suppliers", "Fournisseurs", ["suppliers.read"], Suppliers],
+  ["/employes", "users", "Employés", ["users.manage"], Employees], ["/inventaires", "inventory", "Inventaires", ["inventories.run", "control.read"], Inventories],
+  ["/controle", "control", "Contrôle", ["control.read"], Control], ["/historique", "shield", "Suivi", ["audit.read"], Journal],
+  ["/rapports", "reports", "Rapports", ["reports.read"], Reports], ["/parametres", "settings", "Paramètres", ["settings.write"], Settings],
 ];
 
 function Password({ onClose }) {
@@ -41,12 +45,12 @@ export default function App() {
   const [open, setOpen] = useState(false); const [pw, setPw] = useState(false);
   if (!ready) return <p className="muted center">Chargement…</p>;
   if (!user) return <Login />;
-  const items = NAV.filter((n) => can(...n[3]));
+  const items = NAV.filter((n) => can(...n[3]) && (!SIMPLE || SIMPLE_PATHS.has(n[0])));
   const home = can("reports.read") ? "/" : "/ventes";
   return (
     <div className="app">
-      <header><button className="burger" onClick={() => setOpen(!open)}>☰</button><b>{settings?.company_name || "DJAMIL HIJAB"}</b><span className="who" onClick={() => setPw(true)}>{user.full_name}</span><button className="btn ghost" onClick={logout}>Quitter</button></header>
-      <nav className={open ? "open" : ""} onClick={() => setOpen(false)}>{items.map((n) => <NavLink key={n[0]} to={n[0]} end={n[0] === "/"}><span>{n[1]}</span> {n[2]}</NavLink>)}</nav>
+      <header><button className="burger" onClick={() => setOpen(!open)} aria-label="Menu"><Icon name="menu" size={24} /></button><span className="brand-mark">DH</span><b>{settings?.company_name || "DJAMIL HIJAB"}</b><span className="who" onClick={() => setPw(true)}>{user.full_name}</span><InstallButton className="btn ghost hbtn" label="Installer" /><button className="btn ghost hbtn" onClick={logout} aria-label="Se déconnecter"><Icon name="logout" size={18} /> <span className="hide-sm">Quitter</span></button></header>
+      <nav className={open ? "open" : ""} onClick={() => setOpen(false)}>{items.map((n) => <NavLink key={n[0]} to={n[0]} end={n[0] === "/"}><Icon name={n[1]} /> <span>{n[2]}</span></NavLink>)}</nav>
       <main>
         <Routes>
           {items.map(([path, , , , Comp]) => <Route key={path} path={path} element={<Comp />} />)}

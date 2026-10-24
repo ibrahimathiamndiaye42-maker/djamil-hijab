@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, openPdf } from "../api";
+import { api, openPdf, shareInvoiceWhatsApp } from "../api";
 import { useAuth } from "../auth";
+import { Icon } from "../icons";
 import { Alert, Field, Modal, Pager, Table, dt, fmt, useDebounced, useList } from "../ui";
 
 export default function Invoices() {
@@ -34,7 +35,7 @@ export default function Invoices() {
           <p className="row big"><span>Total</span><b>{fmt(v.total)}</b></p><p className="row"><span>Payé</span><b>{fmt(v.paid)}</b></p>
           <p className="muted">{v.payments.map((p) => `${p.method} ${fmt(p.amount)}`).join(" · ")}</p>
           <Alert>{err}</Alert>
-          <div className="actions"><button className="btn" onClick={() => openPdf(v.invoice_id)}>Facture PDF</button></div>
+          <div className="actions"><button className="btn" onClick={() => shareInvoiceWhatsApp(v, settings?.company_name || "", settings?.currency || "FCFA").catch((e) => setErr(e.message))}><Icon name="whatsapp" size={18} /> Envoyer par WhatsApp</button><button className="btn ghost" onClick={() => openPdf(v.invoice_id)}>Voir le PDF</button></div>
           {v.status === "VALIDEE" && v.rest > 0 && can("sales.create") && <div className="line pay"><select value={pay.method} onChange={(e) => setPay({ ...pay, method: e.target.value })}>{methods.map((m) => <option key={m}>{m}</option>)}</select>
             <input type="number" placeholder={`Reste ${fmt(v.rest)}`} value={pay.amount} onChange={(e) => setPay({ ...pay, amount: e.target.value })} /><button className="btn" onClick={addPay}>Encaisser</button></div>}
           {v.status === "VALIDEE" && can("sales.cancel") && <Field label="Annuler cette facture (avoir + retour en stock)"><div className="line pay"><input placeholder="Motif obligatoire" value={reason} onChange={(e) => setReason(e.target.value)} /><button className="btn danger" disabled={!reason} onClick={cancel}>Annuler</button></div></Field>}

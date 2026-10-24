@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { api, openPdf } from "../api";
+import { api, openPdf, shareInvoiceWhatsApp } from "../api";
 import { useAuth } from "../auth";
+import { Icon } from "../icons";
 import { Alert, Field, Modal, ProductPicker, fmt, useDebounced } from "../ui";
 
 function CustomerPicker({ value, onChange }) {
@@ -12,7 +13,7 @@ function CustomerPicker({ value, onChange }) {
     let live = true; api("/customers", { params: { q: dq, per_page: 6 } }).then((r) => live && setRes(r.items)).catch(() => {});
     return () => { live = false; };
   }, [dq]); // eslint-disable-line
-  if (value) return <p className="row"><span>👤 <b>{value.name}</b> {value.phone}</span><button className="btn ghost" onClick={() => onChange(null)}>Changer</button></p>;
+  if (value) return <p className="row"><span><Icon name="user" size={18} /> <b>{value.name}</b> {value.phone}</span><button className="btn ghost" onClick={() => onChange(null)}>Changer</button></p>;
   const create = async (e) => {
     e.preventDefault(); setErr("");
     try { onChange(await api("/customers", { method: "POST", body: nw })); setNw(null); } catch (x) { setErr(x.message); }
@@ -57,7 +58,7 @@ export default function Sales() {
       {cart.map((l) => (
         <div className="line" key={l.p.id}><span>{l.p.name}<br /><small>{fmt(l.p.sell_price)} {cur} · stock {l.p.stock_qty}</small></span>
           <input type="number" min="1" value={l.qty} onChange={(e) => setQty(l.p.id, e.target.value)} />
-          <b>{fmt(l.p.sell_price * l.qty)}</b><button className="btn ghost" onClick={() => setCart(cart.filter((x) => x.p.id !== l.p.id))}>✕</button></div>))}
+          <b>{fmt(l.p.sell_price * l.qty)}</b><button className="btn ghost" onClick={() => setCart(cart.filter((x) => x.p.id !== l.p.id))}><Icon name="close" size={16} /></button></div>))}
       {!cart.length && <p className="muted center">Recherchez un produit pour l'ajouter au panier.</p>}
       <div className="card">
         <CustomerPicker value={customer} onChange={setCustomer} />
@@ -77,9 +78,9 @@ export default function Sales() {
         <button className="btn full" disabled={!cart.length || busy} onClick={validate}>{busy ? "Validation…" : "Valider la vente"}</button>
       </div>
       {done && (
-        <Modal title="Vente enregistrée ✅" onClose={reset}>
-          <p><b>{done.invoice}</b> — {fmt(done.total)} {cur}</p><p className="muted">Stock mis à jour. Opération enregistrée dans l'historique.</p>
-          <div className="actions"><button className="btn" onClick={() => openPdf(done.invoice_id)}>Facture PDF</button><button className="btn ghost" onClick={reset}>Nouvelle vente</button></div>
+        <Modal title="Vente enregistrée" onClose={reset}>
+          <p><b>{done.invoice}</b> — {fmt(done.total)} {cur}</p><p className="muted">Stock mis à jour. {done.customer_phone ? `Client : ${done.customer} (${done.customer_phone})` : "Astuce : choisissez un client avec son numéro pour envoyer la facture directement."}</p>
+          <div className="actions"><button className="btn" onClick={() => shareInvoiceWhatsApp(done, settings?.company_name || "", cur).catch((e) => alert(e.message))}><Icon name="whatsapp" size={18} /> Envoyer par WhatsApp</button><button className="btn ghost" onClick={() => openPdf(done.invoice_id)}>Voir le PDF</button><button className="btn ghost" onClick={reset}>Nouvelle vente</button></div>
         </Modal>)}
     </>
   );

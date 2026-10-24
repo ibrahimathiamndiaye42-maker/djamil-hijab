@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../auth";
 import { Alert, Field } from "../ui";
+import InstallButton from "../Install.jsx";
 
 export default function Login() {
   const { login } = useAuth();
@@ -19,6 +20,7 @@ export default function Login() {
         <Field label="Mot de passe"><input type="password" value={p} onChange={(e) => setP(e.target.value)} required /></Field>
         <button className="btn" disabled={busy}>{busy ? "Connexion…" : "Se connecter"}</button>
       </form>
+      <div className="login-install"><InstallButton className="btn ghost install" label="Installer l'application sur mon téléphone" /></div>
     </div>
   );
 }
